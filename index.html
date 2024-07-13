@@ -1,37 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SpendyBuddy</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 0 20px; }
-        form, #expense-list, #report-section { margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        button { margin: 5px; padding: 5px 10px; cursor: pointer; }
-        .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100dvw; height: 100dvh; overflow: auto; background-color: rgba(0,0,0,0.4); }
-        .modal-content { background-color: #fefefe; margin: 5% auto; padding: 20px; border: 1px solid #888; width: 100%; max-width: 1200px; height: 800px;border-radius: 30px; }
-        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
-        .close:hover { color: black; }
-        #settings-content { display: flex; justify-content: space-between; }
-        #settings-content > div { width: 45%; }
-        .tag { display: inline-block; background-color: #e0e0e0; padding: 2px 5px; margin: 2px; border-radius: 3px; }
-        .tag button { margin-left: 5px; padding: 0 3px; background: none; border: none; cursor: pointer; }
-        #debug-log { 
-            background-color: #f8f8f8; 
-            border: 1px solid #ddd; 
-            padding: 10px; 
-            margin-top: 20px; 
-            height: 200px; 
-            overflow-y: auto; 
+        header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 150px;
+            background-color: #f2f2f2;
+            border-radius: 50%;
+            margin: 20px auto;
+            width: 150px;
+            height: 150px;
+            overflow: hidden;
+        }
+
+        header img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        form,
+        #expense-list,
+        #report-section {
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        button {
+            margin: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100dvw;
+            height: 100dvh;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 100%;
+            max-width: 1200px;
+            height: 800px;
+            border-radius: 30px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        #settings-content {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #settings-content>div {
+            width: 45%;
+        }
+
+        .tag {
+            display: inline-block;
+            background-color: #e0e0e0;
+            padding: 2px 5px;
+            margin: 2px;
+            border-radius: 3px;
+        }
+
+        .tag button {
+            margin-left: 5px;
+            padding: 0 3px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        #debug-log {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 20px;
+            height: 200px;
+            overflow-y: auto;
             font-family: monospace;
         }
-        .unnecessary-spend { background-color: #ffcccc; }
-        #today-expenses { margin-top: 20px; }
+
+        .unnecessary-spend {
+            background-color: #ffcccc;
+        }
+
+        #today-expenses {
+            margin-top: 20px;
+        }
     </style>
 </head>
+
 <body>
     <header>
         <img src="./logo/SpendyBuddy.png" alt="SpendyBuddy Logo">
@@ -197,15 +310,15 @@
 
         function updateCategoryDropdown() {
             const select = document.getElementById('expense-category');
-            select.innerHTML = '<option value="">Select Category</option>' + 
-                               categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+            select.innerHTML = '<option value="">Select Category</option>' +
+                categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
             log('Category dropdown updated');
         }
 
         function updateFamilyMemberDropdown() {
             const select = document.getElementById('family-member');
-            select.innerHTML = '<option value="">Select Family Member</option>' + 
-                               familyMembers.map(member => `<option value="${member}">${member}</option>`).join('');
+            select.innerHTML = '<option value="">Select Family Member</option>' +
+                familyMembers.map(member => `<option value="${member}">${member}</option>`).join('');
             log('Family member dropdown updated');
         }
 
@@ -229,7 +342,7 @@
             log(`Adding category: ${category}`);
             const transaction = db.transaction(['categories'], 'readwrite');
             const store = transaction.objectStore('categories');
-            await store.add({name: category});
+            await store.add({ name: category });
             categories.push(category);
             updateCategoryDropdown();
             displayCategories();
@@ -240,7 +353,7 @@
             log(`Adding family member: ${member}`);
             const transaction = db.transaction(['familyMembers'], 'readwrite');
             const store = transaction.objectStore('familyMembers');
-            await store.add({name: member});
+            await store.add({ name: member });
             familyMembers.push(member);
             updateFamilyMemberDropdown();
             displayFamilyMembers();
@@ -369,16 +482,16 @@
                 const transaction = db.transaction(['expenses'], 'readonly');
                 const store = transaction.objectStore('expenses');
                 const request = store.getAll();
-                
+
                 request.onerror = () => {
                     log('Error fetching expenses: ' + request.error);
                     throw request.error;
                 };
-                
+
                 request.onsuccess = () => {
                     const expenses = request.result;
                     log(`Retrieved ${expenses.length} expenses`);
-                    
+
                     const tbody = document.querySelector('#expense-table tbody');
                     tbody.innerHTML = expenses.map(e => `
                         <tr class="${e.unnecessary ? 'unnecessary-spend' : ''}">
@@ -405,7 +518,7 @@
         function displayTodayExpenses(expenses) {
             const today = new Date().toISOString().split('T')[0];
             const todayExpenses = expenses.filter(e => e.date === today);
-            
+
             const tbody = document.querySelector('#today-expense-table tbody');
             tbody.innerHTML = todayExpenses.map(e => `
                 <tr class="${e.unnecessary ? 'unnecessary-spend' : ''}">
@@ -494,11 +607,11 @@
                         <h3>Report for ${month}</h3>
                         <h4>Total Expense: ₹${totalExpense.toFixed(2)}</h4>
                         <h4>Category-wise Breakdown:</h4>
-                        <ul>${Object.entries(categoryTotals).map(([category, amount]) => 
-                            `<li>${category}: ₹${amount.toFixed(2)}</li>`).join('')}
+                        <ul>${Object.entries(categoryTotals).map(([category, amount]) =>
+                        `<li>${category}: ₹${amount.toFixed(2)}</li>`).join('')}
                         </ul>
                         <h4>Item-wise Breakdown:</h4>
-                        <ul>${Object.entries(itemTotals).map(([item, amount]) => 
+                        <ul>${Object.entries(itemTotals).map(([item, amount]) =>
                             `<li>${item}: ₹${amount.toFixed(2)}</li>`).join('')}
                         </ul>
                     `;
@@ -534,4 +647,5 @@
         window.removeFamilyMember = removeFamilyMember;
     </script>
 </body>
+
 </html>
