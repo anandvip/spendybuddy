@@ -1,68 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SpendyBuddy</title>
     <style>
-        header {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 150px;
-            background-color: #f2f2f2;
-            border-radius: 50%;
-            margin: 20px auto;
-            width: 150px;
-            height: 150px;
-            overflow: hidden;
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #45a049;
+            --background-color: #f4f4f4;
+            --text-color: #333;
+            --border-color: #ddd;
         }
 
-        header img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-        }
-
-        h1 {
-            text-align: center;
+        * {
+            box-sizing: border-box;
         }
 
         body {
             font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 0 20px;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
         }
 
-        form,
-        #expense-list,
-        #report-section {
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
             margin-bottom: 20px;
+        }
+
+        header img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        h1, h2, h3 {
+            text-align: center;
+        }
+
+        form, #expense-list, #report-section, #today-expenses {
+            margin-bottom: 20px;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 20px;
         }
 
-        th,
-        td {
-            border: 1px solid #ddd;
-            padding: 8px;
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
             text-align: left;
         }
 
         th {
-            background-color: #f2f2f2;
-        }
-
-        button {
-            margin: 5px;
-            padding: 5px 10px;
-            cursor: pointer;
+            background-color: var(--primary-color);
+            color: white;
         }
 
         .modal {
@@ -71,21 +97,20 @@
             z-index: 1;
             left: 0;
             top: 0;
-            width: 100dvw;
-            height: 100dvh;
+            width: 100%;
+            height: 100%;
             overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
+            background-color: rgba(0,0,0,0.4);
         }
 
         .modal-content {
             background-color: #fefefe;
-            margin: 5% auto;
+            margin: 10% auto;
             padding: 20px;
             border: 1px solid #888;
-            width: 100%;
-            max-width: 1200px;
-            height: 800px;
-            border-radius: 30px;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 8px;
         }
 
         .close {
@@ -97,137 +122,189 @@
         }
 
         .close:hover {
-            color: black;
+            color: #000;
         }
 
         #settings-content {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
         }
 
-        #settings-content>div {
-            width: 45%;
+        #settings-content > div {
+            margin-bottom: 20px;
         }
 
         .tag {
             display: inline-block;
             background-color: #e0e0e0;
-            padding: 2px 5px;
-            margin: 2px;
-            border-radius: 3px;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 20px;
+            font-size: 14px;
         }
 
         .tag button {
-            margin-left: 5px;
-            padding: 0 3px;
             background: none;
             border: none;
+            color: #666;
             cursor: pointer;
+            font-size: 16px;
+            padding: 0 5px;
         }
 
         #debug-log {
             background-color: #f8f8f8;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-color);
             padding: 10px;
             margin-top: 20px;
             height: 200px;
             overflow-y: auto;
             font-family: monospace;
+            font-size: 14px;
         }
 
         .unnecessary-spend {
             background-color: #ffcccc;
         }
 
-        #today-expenses {
-            margin-top: 20px;
+        @media screen and (max-width: 600px) {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+
+            thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+            tr {
+                margin-bottom: 15px;
+            }
+
+            td {
+                border: none;
+                position: relative;
+                padding-left: 50%;
+            }
+
+            td:before {
+                position: absolute;
+                top: 6px;
+                left: 6px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                content: attr(data-label);
+                font-weight: bold;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 5% auto;
+            }
         }
     </style>
 </head>
-
 <body>
-    <header>
-        <img src="./logo/SpendyBuddy.png" alt="SpendyBuddy Logo">
-    </header>
-    <h1>SpendyBuddy</h1>
-    <button id="open-settings">Settings</button>
-    <form id="expense-form">
-        <select id="family-member" required>
-            <option value="">Select Family Member</option>
-        </select>
-        <input type="text" id="expense-name" placeholder="Expense Name" required>
-        <input type="number" id="expense-amount" placeholder="Amount" step="0.01" required>
-        <input type="date" id="expense-date" required>
-        <select id="expense-category" required>
-            <option value="">Select Category</option>
-        </select>
-        <button type="submit">Add Expense</button>
-    </form>
-    <div id="expense-list">
-        <h2>Expense List</h2>
-        <table id="expense-table">
-            <thead>
-                <tr>
-                    <th>Family Member</th>
-                    <th>Expense</th>
-                    <th>Amount (₹)</th>
-                    <th>Date</th>
-                    <th>Category</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-    <div id="today-expenses">
-        <h2>Today's Expenses</h2>
-        <table id="today-expense-table">
-            <thead>
-                <tr>
-                    <th>Family Member</th>
-                    <th>Expense</th>
-                    <th>Amount (₹)</th>
-                    <th>Category</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-    <div id="report-section">
-        <h2>Monthly Report</h2>
-        <input type="month" id="report-month">
-        <button id="generate-report">Generate Report</button>
-        <div id="report-result"></div>
-    </div>
-    <div id="settings-modal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Settings</h2>
-            <div id="settings-content">
-                <div>
-                    <h3>Categories</h3>
-                    <div id="category-list"></div>
-                    <input type="text" id="new-category" placeholder="New Category">
-                    <button id="add-category">Add Category</button>
-                </div>
-                <div>
-                    <h3>Family Members</h3>
-                    <div id="member-list"></div>
-                    <input type="text" id="new-member" placeholder="New Member">
-                    <button id="add-member">Add Member</button>
+    <div class="container">
+        <header>
+            <img src="./logo/SpendyBuddy.png" alt="SpendyBuddy Logo">
+            <h1>SpendyBuddy</h1>
+        </header>
+        <button id="open-settings">Settings</button>
+        <form id="expense-form">
+            <select id="family-member" required>
+                <option value="">Select Family Member</option>
+            </select>
+            <input type="text" id="expense-name" placeholder="Expense Name" required>
+            <input type="number" id="expense-amount" placeholder="Amount" step="0.01" required>
+            <input type="date" id="expense-date" required>
+            <select id="expense-category" required>
+                <option value="">Select Category</option>
+            </select>
+            <button type="submit">Add Expense</button>
+        </form>
+        <div id="expense-list">
+            <h2>Expense List</h2>
+            <table id="expense-table">
+                <thead>
+                    <tr>
+                        <th>Family Member</th>
+                        <th>Expense</th>
+                        <th>Amount (₹)</th>
+                        <th>Date</th>
+                        <th>Category</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div id="today-expenses">
+            <h2>Today's Expenses</h2>
+            <table id="today-expense-table">
+                <thead>
+                    <tr>
+                        <th>Family Member</th>
+                        <th>Expense</th>
+                        <th>Amount (₹)</th>
+                        <th>Category</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div id="report-section">
+            <h2>Monthly Report</h2>
+            <input type="month" id="report-month">
+            <button id="generate-report">Generate Report</button>
+            <div id="report-result"></div>
+        </div>
+        <div id="settings-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Settings</h2>
+                <div id="settings-content">
+                    <div>
+                        <h3>Categories</h3>
+                        <div id="category-list"></div>
+                        <input type="text" id="new-category" placeholder="New Category">
+                        <button id="add-category">Add Category</button>
+                    </div>
+                    <div>
+                        <h3>Family Members</h3>
+                        <div id="member-list"></div>
+                        <input type="text" id="new-member" placeholder="New Member">
+                        <button id="add-member">Add Member</button>
+                    </div>
                 </div>
             </div>
         </div>
+        <div id="edit-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Edit Expense</h2>
+                <form id="edit-expense-form">
+                    <input type="hidden" id="edit-expense-id">
+                    <select id="edit-family-member" required></select>
+                    <input type="text" id="edit-expense-name" placeholder="Expense Name" required>
+                    <input type="number" id="edit-expense-amount" placeholder="Amount" step="0.01" required>
+                    <input type="date" id="edit-expense-date" required>
+                    <select id="edit-expense-category" required></select>
+                    <button type="submit">Update Expense</button>
+                </form>
+            </div>
+        </div>
+        <h3>Debug Log</h3>
+        <div id="debug-log"></div>
     </div>
-    <h3>Debug Log</h3>
-    <div id="debug-log"></div>
 
     <script>
         let db;
         let categories = [];
         let familyMembers = [];
-        let dbInitialized = false;
 
         function log(message) {
             console.log(message);
@@ -248,7 +325,6 @@
                 };
                 request.onsuccess = (event) => {
                     db = event.target.result;
-                    dbInitialized = true;
                     log('Database opened successfully');
                     resolve(db);
                 };
@@ -308,18 +384,21 @@
             });
         }
 
-        function updateCategoryDropdown() {
-            const select = document.getElementById('expense-category');
-            select.innerHTML = '<option value="">Select Category</option>' +
-                categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
-            log('Category dropdown updated');
-        }
+        function updateDropdowns() {
+            const categorySelects = document.querySelectorAll('#expense-category, #edit-expense-category');
+            const familyMemberSelects = document.querySelectorAll('#family-member, #edit-family-member');
 
-        function updateFamilyMemberDropdown() {
-            const select = document.getElementById('family-member');
-            select.innerHTML = '<option value="">Select Family Member</option>' +
-                familyMembers.map(member => `<option value="${member}">${member}</option>`).join('');
-            log('Family member dropdown updated');
+            categorySelects.forEach(select => {
+                select.innerHTML = '<option value="">Select Category</option>' +
+                    categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+            });
+
+            familyMemberSelects.forEach(select => {
+                select.innerHTML = '<option value="">Select Family Member</option>' +
+                    familyMembers.map(member => `<option value="${member}">${member}</option>`).join('');
+            });
+
+            log('Dropdowns updated');
         }
 
         function displayCategories() {
@@ -344,7 +423,7 @@
             const store = transaction.objectStore('categories');
             await store.add({ name: category });
             categories.push(category);
-            updateCategoryDropdown();
+            updateDropdowns();
             displayCategories();
             log(`Category ${category} added successfully`);
         }
@@ -355,7 +434,7 @@
             const store = transaction.objectStore('familyMembers');
             await store.add({ name: member });
             familyMembers.push(member);
-            updateFamilyMemberDropdown();
+            updateDropdowns();
             displayFamilyMembers();
             log(`Family member ${member} added successfully`);
         }
@@ -366,7 +445,7 @@
             const store = transaction.objectStore('categories');
             await store.delete(category);
             categories = categories.filter(c => c !== category);
-            updateCategoryDropdown();
+            updateDropdowns();
             displayCategories();
             log(`Category ${category} removed successfully`);
         }
@@ -377,83 +456,10 @@
             const store = transaction.objectStore('familyMembers');
             await store.delete(member);
             familyMembers = familyMembers.filter(m => m !== member);
-            updateFamilyMemberDropdown();
+            updateDropdowns();
             displayFamilyMembers();
             log(`Family member ${member} removed successfully`);
         }
-
-        document.getElementById('open-settings').onclick = () => {
-            log('Opening settings modal');
-            document.getElementById('settings-modal').style.display = 'block';
-        };
-
-        document.querySelector('.close').onclick = () => {
-            log('Closing settings modal');
-            document.getElementById('settings-modal').style.display = 'none';
-        };
-
-        document.getElementById('add-category').onclick = () => {
-            const newCategory = document.getElementById('new-category').value.trim();
-            if (newCategory) {
-                addCategory(newCategory);
-                document.getElementById('new-category').value = '';
-            } else {
-                log('Attempted to add empty category');
-            }
-        };
-
-        document.getElementById('add-member').onclick = () => {
-            const newMember = document.getElementById('new-member').value.trim();
-            if (newMember) {
-                addFamilyMember(newMember);
-                document.getElementById('new-member').value = '';
-            } else {
-                log('Attempted to add empty family member');
-            }
-        };
-
-        async function initializeApp() {
-            log('Initializing app...');
-            try {
-                await openDatabase();
-                await loadCategories();
-                await loadFamilyMembers();
-                updateCategoryDropdown();
-                updateFamilyMemberDropdown();
-                displayCategories();
-                displayFamilyMembers();
-                await displayExpenses();
-                log('App initialized successfully');
-            } catch (error) {
-                log('Error initializing app: ' + error);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            log('DOM loaded, starting app initialization...');
-            initializeApp();
-
-            document.getElementById('expense-form').onsubmit = async (e) => {
-                e.preventDefault();
-                log('Expense form submitted');
-                const expense = {
-                    familyMember: document.getElementById('family-member').value,
-                    name: document.getElementById('expense-name').value,
-                    amount: parseFloat(document.getElementById('expense-amount').value),
-                    date: document.getElementById('expense-date').value,
-                    category: document.getElementById('expense-category').value
-                };
-                try {
-                    await addExpense(expense);
-                    await displayExpenses();
-                    e.target.reset();
-                } catch (error) {
-                    log('Error submitting expense: ' + error);
-                }
-            };
-
-            document.getElementById('generate-report').onclick = generateReport;
-        });
 
         async function addExpense(expense) {
             log(`Adding expense: ${JSON.stringify(expense)}`);
@@ -472,11 +478,41 @@
             });
         }
 
+        async function updateExpense(expense) {
+            log(`Updating expense: ${JSON.stringify(expense)}`);
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['expenses'], 'readwrite');
+                const store = transaction.objectStore('expenses');
+                const request = store.put(expense);
+                request.onerror = () => {
+                    log('Error updating expense: ' + request.error);
+                    reject(request.error);
+                };
+                request.onsuccess = () => {
+                    log('Expense updated successfully');
+                    resolve(request.result);
+                };
+            });
+        }
+
+        async function deleteExpense(id) {
+            log(`Deleting expense with id: ${id}`);
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['expenses'], 'readwrite');
+                const store = transaction.objectStore('expenses');
+                const request = store.delete(id);
+                request.onerror = () => {
+                    log('Error deleting expense: ' + request.error);
+                    reject(request.error);
+                };
+                request.onsuccess = () => {
+                    log('Expense deleted successfully');
+                    resolve();
+                };
+            });
+        }
+
         async function displayExpenses() {
-            if (!dbInitialized) {
-                log('Database not initialized. Skipping expense display.');
-                return;
-            }
             log('Fetching expenses for display');
             try {
                 const transaction = db.transaction(['expenses'], 'readonly');
@@ -502,7 +538,7 @@
                             <td>${e.category}</td>
                             <td>
                                 <button onclick="editExpense(${e.id})">Edit</button>
-                                <button onclick="deleteExpense(${e.id})">Delete</button>
+                                <button onclick="deleteExpenseHandler(${e.id})">Delete</button>
                                 <button onclick="toggleUnnecessary(${e.id})">${e.unnecessary ? 'Mark Necessary' : 'Mark Unnecessary'}</button>
                             </td>
                         </tr>
@@ -624,28 +660,140 @@
             }
         }
 
-        // Make sure these are in the global scope
-        window.editExpense = (id) => {
+        function editExpense(id) {
             log(`Edit expense clicked for id: ${id}`);
-            // Implement edit functionality
-        };
+            const transaction = db.transaction(['expenses'], 'readonly');
+            const store = transaction.objectStore('expenses');
+            const request = store.get(id);
 
-        window.deleteExpense = async (id) => {
+            request.onerror = () => {
+                log('Error fetching expense for edit: ' + request.error);
+            };
+
+            request.onsuccess = () => {
+                const expense = request.result;
+                document.getElementById('edit-expense-id').value = expense.id;
+                document.getElementById('edit-family-member').value = expense.familyMember;
+                document.getElementById('edit-expense-name').value = expense.name;
+                document.getElementById('edit-expense-amount').value = expense.amount;
+                document.getElementById('edit-expense-date').value = expense.date;
+                document.getElementById('edit-expense-category').value = expense.category;
+
+                document.getElementById('edit-modal').style.display = 'block';
+            };
+        }
+
+        async function deleteExpenseHandler(id) {
             log(`Delete expense clicked for id: ${id}`);
-            try {
-                const transaction = db.transaction(['expenses'], 'readwrite');
-                const store = transaction.objectStore('expenses');
-                await store.delete(id);
-                log(`Expense with id ${id} deleted successfully`);
-                await displayExpenses();
-            } catch (error) {
-                log('Error deleting expense: ' + error);
+            if (confirm('Are you sure you want to delete this expense?')) {
+                try {
+                    await deleteExpense(id);
+                    await displayExpenses();
+                } catch (error) {
+                    log('Error deleting expense: ' + error);
+                }
             }
-        };
+        }
 
-        window.removeCategory = removeCategory;
-        window.removeFamilyMember = removeFamilyMember;
+        async function initializeApp() {
+            log('Initializing app...');
+            try {
+                await openDatabase();
+                await loadCategories();
+                await loadFamilyMembers();
+                updateDropdowns();
+                displayCategories();
+                displayFamilyMembers();
+                await displayExpenses();
+                log('App initialized successfully');
+            } catch (error) {
+                log('Error initializing app: ' + error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            log('DOM loaded, starting app initialization...');
+            initializeApp();
+
+            document.getElementById('expense-form').onsubmit = async (e) => {
+                e.preventDefault();
+                log('Expense form submitted');
+                const expense = {
+                    familyMember: document.getElementById('family-member').value,
+                    name: document.getElementById('expense-name').value,
+                    amount: parseFloat(document.getElementById('expense-amount').value),
+                    date: document.getElementById('expense-date').value,
+                    category: document.getElementById('expense-category').value
+                };
+                try {
+                    await addExpense(expense);
+                    await displayExpenses();
+                    e.target.reset();
+                } catch (error) {
+                    log('Error submitting expense: ' + error);
+                }
+            };
+
+            document.getElementById('edit-expense-form').onsubmit = async (e) => {
+                e.preventDefault();
+                log('Edit expense form submitted');
+                const updatedExpense = {
+                    id: parseInt(document.getElementById('edit-expense-id').value),
+                    familyMember: document.getElementById('edit-family-member').value,
+                    name: document.getElementById('edit-expense-name').value,
+                    amount: parseFloat(document.getElementById('edit-expense-amount').value),
+                    date: document.getElementById('edit-expense-date').value,
+                    category: document.getElementById('edit-expense-category').value
+                };
+                try {
+                    await updateExpense(updatedExpense);
+                    document.getElementById('edit-modal').style.display = 'none';
+                    await displayExpenses();
+                } catch (error) {
+                    log('Error updating expense: ' + error);
+                }
+            };
+
+            document.getElementById('generate-report').onclick = generateReport;
+
+            document.getElementById('open-settings').onclick = () => {
+                log('Opening settings modal');
+                document.getElementById('settings-modal').style.display = 'block';
+            };
+
+            document.querySelectorAll('.close').forEach(closeBtn => {
+                closeBtn.onclick = function() {
+                    this.closest('.modal').style.display = 'none';
+                    log('Closing modal');
+                };
+            });
+
+            document.getElementById('add-category').onclick = () => {
+                const newCategory = document.getElementById('new-category').value.trim();
+                if (newCategory) {
+                    addCategory(newCategory);
+                    document.getElementById('new-category').value = '';
+                } else {
+                    log('Attempted to add empty category');
+                }
+            };
+
+            document.getElementById('add-member').onclick = () => {
+                const newMember = document.getElementById('new-member').value.trim();
+                if (newMember) {
+                    addFamilyMember(newMember);
+                    document.getElementById('new-member').value = '';
+                } else {
+                    log('Attempted to add empty family member');
+                }
+            };
+
+            window.removeCategory = removeCategory;
+            window.removeFamilyMember = removeFamilyMember;
+            window.editExpense = editExpense;
+            window.deleteExpenseHandler = deleteExpenseHandler;
+            window.toggleUnnecessary = toggleUnnecessary;
+        });
     </script>
 </body>
-
 </html>
