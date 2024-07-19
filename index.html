@@ -167,6 +167,27 @@
             background-color: #ffcccc;
         }
 
+        #report-result {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        #report-result h3, #report-result h4 {
+            margin-top: 0;
+        }
+
+        .report-text {
+            white-space: pre-wrap;
+            font-family: monospace;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
         @media screen and (max-width: 600px) {
             table, thead, tbody, th, td, tr {
                 display: block;
@@ -261,6 +282,7 @@
             <input type="month" id="report-month">
             <button id="generate-report">Generate Report</button>
             <div id="report-result"></div>
+            <button id="copyReportBtn" style="display:none;">Copy Report to Clipboard</button>
         </div>
         <div id="settings-modal" class="modal">
             <div class="modal-content">
@@ -531,12 +553,12 @@
                     const tbody = document.querySelector('#expense-table tbody');
                     tbody.innerHTML = expenses.map(e => `
                         <tr class="${e.unnecessary ? 'unnecessary-spend' : ''}">
-                            <td>${e.familyMember}</td>
-                            <td>${e.name}</td>
-                            <td>₹${e.amount.toFixed(2)}</td>
-                            <td>${new Date(e.date).toLocaleDateString()}</td>
-                            <td>${e.category}</td>
-                            <td>
+                            <td data-label="Family Member">${e.familyMember}</td>
+                            <td data-label="Expense">${e.name}</td>
+                            <td data-label="Amount">₹${e.amount.toFixed(2)}</td>
+                            <td data-label="Date">${new Date(e.date).toLocaleDateString()}</td>
+                            <td data-label="Category">${e.category}</td>
+                            <td data-label="Actions">
                                 <button onclick="editExpense(${e.id})">Edit</button>
                                 <button onclick="deleteExpenseHandler(${e.id})">Delete</button>
                                 <button onclick="toggleUnnecessary(${e.id})">${e.unnecessary ? 'Mark Necessary' : 'Mark Unnecessary'}</button>
@@ -558,11 +580,11 @@
             const tbody = document.querySelector('#today-expense-table tbody');
             tbody.innerHTML = todayExpenses.map(e => `
                 <tr class="${e.unnecessary ? 'unnecessary-spend' : ''}">
-                    <td>${e.familyMember}</td>
-                    <td>${e.name}</td>
-                    <td>₹${e.amount.toFixed(2)}</td>
-                    <td>${e.category}</td>
-                    <td>
+                    <td data-label="Family Member">${e.familyMember}</td>
+                    <td data-label="Expense">${e.name}</td>
+                    <td data-label="Amount">₹${e.amount.toFixed(2)}</td>
+                    <td data-label="Category">${e.category}</td>
+                    <td data-label="Actions">
                         <button onclick="toggleUnnecessary(${e.id})">${e.unnecessary ? 'Mark Necessary' : 'Mark Unnecessary'}</button>
                     </td>
                 </tr>
@@ -639,25 +661,62 @@
                         totalExpense += e.amount;
                     });
 
-                    const reportHtml = `
-                        <h3>Report for ${month}</h3>
-                        <h4>Total Expense: ₹${totalExpense.toFixed(2)}</h4>
-                        <h4>Category-wise Breakdown:</h4>
-                        <ul>${Object.entries(categoryTotals).map(([category, amount]) =>
-                        `<li>${category}: ₹${amount.toFixed(2)}</li>`).join('')}
-                        </ul>
-                        <h4>Item-wise Breakdown:</h4>
-                        <ul>${Object.entries(itemTotals).map(([item, amount]) =>
-                            `<li>${item}: ₹${amount.toFixed(2)}</li>`).join('')}
-                        </ul>
-                    `;
+                    const reportData = {
+                        month: month,
+                        totalExpense: totalExpense,
+                        categoryTotals: categoryTotals,
+                        itemTotals: itemTotals
+                    };
 
-                    document.getElementById('report-result').innerHTML = reportHtml;
+                    const { reportHtml, reportText } = generateReportContent(reportData);
+                    const reportResult = document.getElementById('report-result');
+                    reportResult.innerHTML = reportHtml + `<div class="report-text">${reportText}</div>`;
+
+                    const copyReportBtn = document.getElementById('copyReportBtn');
+                    copyReportBtn.style.display = 'block';
+                    copyReportBtn.onclick = () => copyReportToClipboard(reportText);
+
                     log('Report generated and displayed successfully');
                 };
             } catch (error) {
                 log('Error generating report: ' + error);
             }
+        }
+
+        function generateReportContent(reportData) {
+            const reportHtml = `
+                <h3>SpendyBuddy Report for ${reportData.month}</h3>
+                <h4>Total Expense: ₹${reportData.totalExpense.toFixed(2)}</h4>
+                <h4>Category-wise Breakdown:</h4>
+                <ul>${Object.entries(reportData.categoryTotals).map(([category, amount]) =>
+                    `<li>${category}: ₹${amount.toFixed(2)}</li>`).join('')}
+                </ul>
+                <h4>Item-wise Breakdown:</h4>
+                <ul>${Object.entries(reportData.itemTotals).map(([item, amount]) =>
+                    `<li>${item}: ₹${amount.toFixed(2)}</li>`).join('')}
+                </ul>
+            `;
+
+            const reportText = `SpendyBuddy Report for ${reportData.month}
+Total Expense: ₹${reportData.totalExpense.toFixed(2)}
+
+Category-wise Breakdown:
+${Object.entries(reportData.categoryTotals).map(([category, amount]) => `${category}: ₹${amount.toFixed(2)}`).join('\n')}
+
+Item-wise Breakdown:
+${Object.entries(reportData.itemTotals).map(([item, amount]) => `${item}: ₹${amount.toFixed(2)}`).join('\n')}`;
+
+            return { reportHtml, reportText };
+        }
+
+        function copyReportToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Report copied to clipboard!');
+                log('Report copied to clipboard');
+            }, (err) => {
+                console.error('Could not copy text: ', err);
+                log('Error copying report to clipboard: ' + err);
+            });
         }
 
         function editExpense(id) {
@@ -788,12 +847,26 @@
                 }
             };
 
+            // Assign global functions for HTML onclick attributes
             window.removeCategory = removeCategory;
             window.removeFamilyMember = removeFamilyMember;
             window.editExpense = editExpense;
             window.deleteExpenseHandler = deleteExpenseHandler;
             window.toggleUnnecessary = toggleUnnecessary;
         });
+
+        // Add these utility functions at the end
+        function formatDate(date) {
+            const d = new Date(date);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount);
+        }
     </script>
 </body>
 </html>
